@@ -1,0 +1,335 @@
+\section{Camera Class Reference}
+\label{classCamera}\index{Camera@{Camera}}
+
+
+The base class defining a simple camera.  
+
+
+
+
+{\ttfamily \#include $<$camera.\+h$>$}
+
+\subsection*{Public Member Functions}
+\begin{DoxyCompactItemize}
+\item 
+\hyperlink{classCamera_a4a02314716bac5282edd6aee6457f133}{Camera} (string intrinsic\+File\+Path)
+\begin{DoxyCompactList}\small\item\em Costructor for initialization from file. \end{DoxyCompactList}\item 
+\hyperlink{classCamera_a01f94c3543f56ede7af49dc778f19331}{Camera} ()
+\begin{DoxyCompactList}\small\item\em Default Constructor. \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_a2498b18efe884472517a430db83d9c74}{calibrate} (vector$<$ string $>$ image\+List, int board\+Width, int board\+Height)
+\begin{DoxyCompactList}\small\item\em It performs the camera calibration. \end{DoxyCompactList}\item 
+bool \hyperlink{classCamera_a979043e0e738bf3858de6476e12b5a67}{save\+Calibration} (string intrinsic\+File\+Path)
+\begin{DoxyCompactList}\small\item\em It saves the calibration. \end{DoxyCompactList}\item 
+Mat \hyperlink{classCamera_ae261c6f36e0b9c6aa40917b60ae7b1fa}{undistort\+Image} (Mat image)
+\begin{DoxyCompactList}\small\item\em It undistorts an image using the intrinsic parameters. \end{DoxyCompactList}\item 
+Mat \hyperlink{classCamera_af1433656f08f22aa1080d0c6e7a98df6}{get\+Camera\+Matrix} ()
+\begin{DoxyCompactList}\small\item\em It returns the 3x3 camera matrix. \end{DoxyCompactList}\item 
+Mat \hyperlink{classCamera_a1cd15bc4fd4f0405c7e047af632b9353}{get\+Dist\+Vector} ()
+\begin{DoxyCompactList}\small\item\em It returns the 4x1 distortion coefficients. \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_ab1d197f991bc02d373d8833f7da2e7eb}{set\+Camera\+Matrix} (Mat \&K)
+\begin{DoxyCompactList}\small\item\em It sets the camera parameters. \end{DoxyCompactList}\item 
+void \hyperlink{classCamera_a018fb29ce30458045b22eeee47f61057}{set\+Dist\+Coefficients} (Mat \&Dist)
+\begin{DoxyCompactList}\small\item\em It sets the distortion parameters. \end{DoxyCompactList}\end{DoxyCompactItemize}
+
+
+\subsection{Detailed Description}
+The base class defining a simple camera. 
+
+It allows to calibrate the camera and to undistort a pair of images. 
+
+Definition at line 40 of file camera.\+h.
+
+
+
+\subsection{Constructor \& Destructor Documentation}
+\mbox{\label{classCamera_a4a02314716bac5282edd6aee6457f133}} 
+\index{Camera@{Camera}!Camera@{Camera}}
+\index{Camera@{Camera}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{Camera()}{Camera()}\hspace{0.1cm}{\footnotesize\ttfamily [1/2]}}
+{\footnotesize\ttfamily Camera\+::\+Camera (\begin{DoxyParamCaption}\item[{string}]{intrinsic\+File\+Path }\end{DoxyParamCaption})}
+
+
+
+Costructor for initialization from file. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em intrisic\+File\+Name} & the path of the intrinsic parameters file. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 25 of file camera.\+cpp.
+
+
+\begin{DoxyCode}
+25                                        \{
+26         FileStorage fs(intrinsicFilePath.c\_str(), FileStorage::READ);
+27         \textcolor{keywordflow}{if}(!fs.isOpened())
+28         \{
+29             printf(\textcolor{stringliteral}{"Failed to open file %s\(\backslash\)n"}, intrinsicFilePath.c\_str());
+30             \textcolor{keywordflow}{return};
+31         \}
+32         fs[\textcolor{stringliteral}{"camera\_matrix"}] >> K;
+33         fs[\textcolor{stringliteral}{"distortion\_coefficients"}] >> Dist;
+34 
+35 \}
+\end{DoxyCode}
+\mbox{\label{classCamera_a01f94c3543f56ede7af49dc778f19331}} 
+\index{Camera@{Camera}!Camera@{Camera}}
+\index{Camera@{Camera}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{Camera()}{Camera()}\hspace{0.1cm}{\footnotesize\ttfamily [2/2]}}
+{\footnotesize\ttfamily Camera\+::\+Camera (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})\hspace{0.3cm}{\ttfamily [inline]}}
+
+
+
+Default Constructor. 
+
+You should initialize all the intrinsic and extrinsic parameters using the calibrate method 
+
+Definition at line 82 of file camera.\+h.
+
+
+\begin{DoxyCode}
+82 \{\};
+\end{DoxyCode}
+
+
+\subsection{Member Function Documentation}
+\mbox{\label{classCamera_a2498b18efe884472517a430db83d9c74}} 
+\index{Camera@{Camera}!calibrate@{calibrate}}
+\index{calibrate@{calibrate}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{calibrate()}{calibrate()}}
+{\footnotesize\ttfamily void Camera\+::calibrate (\begin{DoxyParamCaption}\item[{vector$<$ string $>$}]{image\+List,  }\item[{int}]{board\+Width,  }\item[{int}]{board\+Height }\end{DoxyParamCaption})}
+
+
+
+It performs the camera calibration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em image\+List} & is the list containing the paths of the images with the chessboard patterns. \\
+\hline
+{\em board\+Width} & the number of inner corners in the width direction of the chess board pattern (see stereo\+Calibration module) \\
+\hline
+{\em board\+Height} & the number of inner corners in the height direction of the chess board pattern (see stereo\+Calibration module) \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 53 of file camera.\+cpp.
+
+
+\begin{DoxyCode}
+53                                                                                 \{
+54     vector<vector<Point2f> > imagePoints;
+55     Size boardSize, imageSize;
+56     boardSize.width=boardWidth;
+57     boardSize.height=boardHeight;
+58     \textcolor{keywordtype}{int} flags=0;
+59     \textcolor{keywordtype}{int} i;
+60 
+61     \textcolor{keywordtype}{float} squareSize = 1.f, aspectRatio = 1.f;
+62 
+63       Mat view, viewGray;
+64 
+65     \textcolor{keywordflow}{for}(i = 0; i<(int)imageList.size();i++)
+66     \{
+67 
+68          view = cv::imread(imageList[i], 1);
+69          imageSize = view.size();
+70          vector<Point2f> pointbuf;
+71          cvtColor(view, viewGray, cv::COLOR\_BGR2GRAY); 
+72 
+73          \textcolor{keywordtype}{bool} found = findChessboardCorners( view, boardSize, pointbuf,
+74                                             cv::CALIB\_CB\_ADAPTIVE\_THRESH + cv::CALIB\_CB\_FAST\_CHECK + 
+      cv::CALIB\_CB\_NORMALIZE\_IMAGE);
+75 
+76          \textcolor{keywordflow}{if}(found) 
+77          \{
+78             drawChessboardCorners( view, boardSize, Mat(pointbuf), found );
+79             imagePoints.push\_back(pointbuf);
+80          \}
+81 
+82     \}
+83     prepareandRunCalibration(imagePoints, imageSize, boardSize, squareSize, aspectRatio, flags, K, Dist);
+84 
+85 
+86 \}
+\end{DoxyCode}
+\mbox{\label{classCamera_af1433656f08f22aa1080d0c6e7a98df6}} 
+\index{Camera@{Camera}!get\+Camera\+Matrix@{get\+Camera\+Matrix}}
+\index{get\+Camera\+Matrix@{get\+Camera\+Matrix}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{get\+Camera\+Matrix()}{getCameraMatrix()}}
+{\footnotesize\ttfamily Mat Camera\+::get\+Camera\+Matrix (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+It returns the 3x3 camera matrix. 
+
+\begin{DoxyReturn}{Returns}
+3x3 camera matrix. 
+\end{DoxyReturn}
+
+
+Definition at line 264 of file camera.\+cpp.
+
+
+
+Referenced by Stereo\+Camera\+::\+Stereo\+Camera().
+
+
+\begin{DoxyCode}
+264                             \{
+265     \textcolor{keywordflow}{return} this->K;
+266 \}
+\end{DoxyCode}
+\mbox{\label{classCamera_a1cd15bc4fd4f0405c7e047af632b9353}} 
+\index{Camera@{Camera}!get\+Dist\+Vector@{get\+Dist\+Vector}}
+\index{get\+Dist\+Vector@{get\+Dist\+Vector}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{get\+Dist\+Vector()}{getDistVector()}}
+{\footnotesize\ttfamily Mat Camera\+::get\+Dist\+Vector (\begin{DoxyParamCaption}{ }\end{DoxyParamCaption})}
+
+
+
+It returns the 4x1 distortion coefficients. 
+
+\begin{DoxyReturn}{Returns}
+4x1 distortion coefficients. 
+\end{DoxyReturn}
+
+
+Definition at line 267 of file camera.\+cpp.
+
+
+
+Referenced by Stereo\+Camera\+::\+Stereo\+Camera().
+
+
+\begin{DoxyCode}
+267                           \{
+268     \textcolor{keywordflow}{return} this->Dist;
+269 \}
+\end{DoxyCode}
+\mbox{\label{classCamera_a979043e0e738bf3858de6476e12b5a67}} 
+\index{Camera@{Camera}!save\+Calibration@{save\+Calibration}}
+\index{save\+Calibration@{save\+Calibration}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{save\+Calibration()}{saveCalibration()}}
+{\footnotesize\ttfamily bool Camera\+::save\+Calibration (\begin{DoxyParamCaption}\item[{string}]{intrinsic\+File\+Path }\end{DoxyParamCaption})}
+
+
+
+It saves the calibration. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em intrinsic\+File\+Path} & the path of the intrinsic parameters file \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 237 of file camera.\+cpp.
+
+
+\begin{DoxyCode}
+237                                                      \{
+238   
+239     \textcolor{keywordflow}{if}(this->K.empty()) \{
+240         printf(\textcolor{stringliteral}{"Camera is not calibrated, run calibration method before..\(\backslash\)n"});
+241         \textcolor{keywordflow}{return} \textcolor{keyword}{false};
+242     \}
+243    FileStorage fs( intrinsicFilePath, FileStorage::WRITE );
+244     fs << \textcolor{stringliteral}{"camera\_matrix"} << this->K;
+245     fs << \textcolor{stringliteral}{"distortion\_coefficients"} << this->Dist;
+246    \textcolor{keywordflow}{return} \textcolor{keyword}{true};
+247 \}
+\end{DoxyCode}
+\mbox{\label{classCamera_ab1d197f991bc02d373d8833f7da2e7eb}} 
+\index{Camera@{Camera}!set\+Camera\+Matrix@{set\+Camera\+Matrix}}
+\index{set\+Camera\+Matrix@{set\+Camera\+Matrix}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{set\+Camera\+Matrix()}{setCameraMatrix()}}
+{\footnotesize\ttfamily void Camera\+::set\+Camera\+Matrix (\begin{DoxyParamCaption}\item[{Mat \&}]{K }\end{DoxyParamCaption})}
+
+
+
+It sets the camera parameters. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em K} & 3x3 camera matrix. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 277 of file camera.\+cpp.
+
+
+\begin{DoxyCode}
+277                                    \{
+278     this->K=K;
+279 \}
+\end{DoxyCode}
+\mbox{\label{classCamera_a018fb29ce30458045b22eeee47f61057}} 
+\index{Camera@{Camera}!set\+Dist\+Coefficients@{set\+Dist\+Coefficients}}
+\index{set\+Dist\+Coefficients@{set\+Dist\+Coefficients}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{set\+Dist\+Coefficients()}{setDistCoefficients()}}
+{\footnotesize\ttfamily void Camera\+::set\+Dist\+Coefficients (\begin{DoxyParamCaption}\item[{Mat \&}]{Dist }\end{DoxyParamCaption})}
+
+
+
+It sets the distortion parameters. 
+
+
+\begin{DoxyParams}{Parameters}
+{\em D} & 4x1 camera distortion parameters. \\
+\hline
+\end{DoxyParams}
+
+
+Definition at line 281 of file camera.\+cpp.
+
+
+\begin{DoxyCode}
+281                                           \{
+282     this->Dist=Dist;
+283 \}
+\end{DoxyCode}
+\mbox{\label{classCamera_ae261c6f36e0b9c6aa40917b60ae7b1fa}} 
+\index{Camera@{Camera}!undistort\+Image@{undistort\+Image}}
+\index{undistort\+Image@{undistort\+Image}!Camera@{Camera}}
+\subsubsection{\texorpdfstring{undistort\+Image()}{undistortImage()}}
+{\footnotesize\ttfamily Mat Camera\+::undistort\+Image (\begin{DoxyParamCaption}\item[{Mat}]{image }\end{DoxyParamCaption})}
+
+
+
+It undistorts an image using the intrinsic parameters. 
+
+\begin{DoxyNote}{Note}
+Set undistortion coefficients and camera matrix before using this method. 
+\end{DoxyNote}
+
+\begin{DoxyParams}{Parameters}
+{\em image} & the input distorted image. \\
+\hline
+\end{DoxyParams}
+\begin{DoxyReturn}{Returns}
+the undistorted image. 
+\end{DoxyReturn}
+
+
+Definition at line 271 of file camera.\+cpp.
+
+
+\begin{DoxyCode}
+271                                     \{
+272     Mat imund;
+273     undistort(image,imund,K,Dist);
+274     \textcolor{keywordflow}{return} imund;
+275 \}
+\end{DoxyCode}
+
+
+The documentation for this class was generated from the following files\+:\begin{DoxyCompactItemize}
+\item 
+/home/runner/work/stereo-\/vision/stereo-\/vision/gh-\/pages/lib/include/i\+Cub/stereo\+Vision/camera.\+h\item 
+/home/runner/work/stereo-\/vision/stereo-\/vision/gh-\/pages/lib/src/camera.\+cpp\end{DoxyCompactItemize}
